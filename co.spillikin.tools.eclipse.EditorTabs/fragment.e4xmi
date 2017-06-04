@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="ASCII"?>
+<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:commands="http://www.eclipse.org/ui/2010/UIModel/application/commands" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_BxaXACerEeWxCPrV0pAZQQ">
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_QqSikIrOEeW7h_qdP9N9fw" featurename="commands" parentElementId="xpath:/">
+    <elements xsi:type="commands:Command" xmi:id="co.spillikin.command.create" elementId="spillikin.handler.CreateCommand" commandName="Create New Session"/>
+    <elements xsi:type="commands:Command" xmi:id="co.spillikin.command.select" elementId="spillikin.handler.SelectCommand" commandName="Select Session"/>
+    <elements xsi:type="commands:Command" xmi:id="co.spillikin.command.rename" elementId="spillikin.handler.RenameCommand" commandName="Update Session Info"/>
+    <elements xsi:type="commands:Command" 
+    xmi:id="co.spillikin.command.delete" 
+    elementId="spillikin.handler.DeleteCommand" 
+    commandName="Delete Current Session"/>
+    <elements xsi:type="commands:Command" 
+    xmi:id="co.spillikin.command.export" 
+    elementId="spillikin.handler.ExportCommand" 
+    commandName="Export Session Data"/>
+    <elements xsi:type="commands:Command" 
+    xmi:id="co.spillikin.command.import" 
+    elementId="spillikin.handler.ImportCommand" 
+    commandName="Import Session Data"/>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_fW12kIrOEeW7h_qdP9N9fw" featurename="handlers" parentElementId="xpath:/">
+    <elements xsi:type="commands:Handler" xmi:id="co.spillikin.handler.create" elementId="org.eclipse.pde.ui.templates.handler.0" contributionURI="bundleclass://co.spillikin.tools.eclipse.EditorTabs/co.spillikin.tools.eclipse.editortabs.handlers.CreateHandler" command="co.spillikin.command.create"/>
+    <elements xsi:type="commands:Handler" xmi:id="co.spillikin.handler.select" elementId="org.eclipse.pde.ui.templates.handler.1" contributionURI="bundleclass://co.spillikin.tools.eclipse.EditorTabs/co.spillikin.tools.eclipse.editortabs.handlers.SelectHandler" command="co.spillikin.command.select"/>
+    <elements xsi:type="commands:Handler" xmi:id="co.spillikin.handler.rename" elementId="org.eclipse.pde.ui.templates.handler.2" contributionURI="bundleclass://co.spillikin.tools.eclipse.EditorTabs/co.spillikin.tools.eclipse.editortabs.handlers.RenameHandler" command="co.spillikin.command.rename"/>
+    <elements xsi:type="commands:Handler" 
+    xmi:id="co.spillikin.handler.delete" 
+    elementId="org.eclipse.pde.ui.templates.handler.3" 
+    contributionURI="bundleclass://co.spillikin.tools.eclipse.EditorTabs/co.spillikin.tools.eclipse.editortabs.handlers.DeleteHandler" 
+    command="co.spillikin.command.delete"/>
+    <elements xsi:type="commands:Handler" 
+    xmi:id="co.spillikin.handler.export" 
+    elementId="org.eclipse.pde.ui.templates.handler.4" 
+    contributionURI="bundleclass://co.spillikin.tools.eclipse.EditorTabs/co.spillikin.tools.eclipse.editortabs.handlers.ExportHandler" 
+    command="co.spillikin.command.export"/>
+    <elements xsi:type="commands:Handler" 
+    xmi:id="co.spillikin.handler.import" 
+    elementId="org.eclipse.pde.ui.templates.handler.5" 
+    contributionURI="bundleclass://co.spillikin.tools.eclipse.EditorTabs/co.spillikin.tools.eclipse.editortabs.handlers.ImportHandler" 
+    command="co.spillikin.command.import"/>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_pVgfIIrOEeW7h_qdP9N9fw" featurename="menuContributions" parentElementId="xpath:/">
+    <elements xsi:type="menu:MenuContribution" xmi:id="_BducUIrPEeW7h_qdP9N9fw" elementId="org.eclipse.pde.ui.templates.menucontribution.1" positionInParent="after=revert" parentId="file">
+      <children xsi:type="menu:Menu" xmi:id="_Dtii0IrPEeW7h_qdP9N9fw" elementId="org.eclipse.pde.ui.templates.menu.e4handlers" label="Editor Sessions..." iconURI="platform:/plugin/co.spillikin.tools.eclipse.EditorTabs/icons/Sample.png">
+        <children xsi:type="menu:HandledMenuItem" xmi:id="co.spillikin.mc2.create" elementId="org.eclipse.pde.ui.templates.handledmenuitem.0" label="" iconURI="" command="co.spillikin.command.create"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="co.spillikin.mc2.select" elementId="org.eclipse.pde.ui.templates.handledmenuitem.1" label="" iconURI="" command="co.spillikin.command.select"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="co.spillikin.mc2.rename" elementId="org.eclipse.pde.ui.templates.handledmenuitem.2" label="" iconURI="" command="co.spillikin.command.rename"/>
+        <children xsi:type="menu:HandledMenuItem" 
+        xmi:id="co.spillikin.mc2.delete" 
+        elementId="org.eclipse.pde.ui.templates.handledmenuitem.3" label="" 
+        iconURI="" command="co.spillikin.command.delete"/>
+        <children xsi:type="menu:HandledMenuItem" 
+        xmi:id="co.spillikin.mc2.export" 
+        elementId="org.eclipse.pde.ui.templates.handledmenuitem.4" label="" 
+        iconURI="" command="co.spillikin.command.export"/>
+        <children xsi:type="menu:HandledMenuItem" 
+        xmi:id="co.spillikin.mc2.import" 
+        elementId="org.eclipse.pde.ui.templates.handledmenuitem.5" label="" 
+        iconURI="" command="co.spillikin.command.import"/>
+      </children>
+    </elements>
+  </fragments>
+</fragment:ModelFragments>
