@@ -1,5 +1,7 @@
 # github-eclipse
 
+Eclipse Editor Sessions tool.
+
 This is code for an eclipse extension that will manage editor tab sessions.  Once installed it appears as a single menu item called "Editor Sessions", just under Revert in the File menu.
 
 For the moment, I'm posting it for code review purposes.  It is feature complete and we're testing it. 
