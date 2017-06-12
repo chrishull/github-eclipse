@@ -2,6 +2,8 @@
 
 Eclipse Editor Sessions tool.
 
+[Just tell me how to install it already!  Sure... Scroll down to === Installation Instructions ===]
+
 This is code for an eclipse extension that will manage editor tab sessions.  Once installed it appears as a single menu item called "Editor Sessions", just under Revert in the File menu.
 
 For the moment, I'm posting it for code review purposes.  It is feature complete and we're testing it. 
@@ -21,7 +23,7 @@ Use this tool.  I think it's useful especially if you work with several assignme
 For now there are no instructions.  Let's see how intuitive the user interface is.
 
 
-Installation instructions.
+=== Installation instructions ===
 
 1: Back up your workspace!
 
