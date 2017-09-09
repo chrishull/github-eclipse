@@ -19,6 +19,8 @@ import org.osgi.framework.BundleContext;
 import co.spillikin.tools.eclipse.editortabs.util.DataUtil;
 import static co.spillikin.tools.eclipse.editortabs.Constants.FILENAME;
 
+import org.eclipse.core.runtime.Status;
+
 /**
  * The Activator is called when the plugin starts and stops.
  * We do some data setup here.  We do not have a user interface yet, 
@@ -42,6 +44,8 @@ public class Activator implements BundleActivator {
      */
     public void start(BundleContext bundleContext) throws Exception {
         Activator.context = bundleContext;
+
+        new Status(Status.INFO, "XXXXXXXXXXXXXXXX FILETAB PLUGIN LOG MESSAGE TEST", null);
 
         // Init our DataContainer.  Let it try to load our XML file.
         String workspacePath = ResourcesPlugin.getWorkspace().getRoot().getLocation().toString();

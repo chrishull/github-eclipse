@@ -27,4 +27,8 @@ public class TabsPluginException extends Exception {
         super(message);
     }
 
+    public TabsPluginException(Throwable t) {
+        super(t);
+    }
+
 }

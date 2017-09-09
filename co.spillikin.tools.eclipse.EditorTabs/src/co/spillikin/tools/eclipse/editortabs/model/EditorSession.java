@@ -53,6 +53,7 @@ public class EditorSession {
     private Boolean isSnapshot = false;
     private Boolean keepAlphabetical = false;
     private List<FileInfo> fileInfoList = new ArrayList<>();
+    private String selectedFile = "";
 
     // Serialization, package, needed by SessionMap
     EditorSession() {
@@ -70,6 +71,19 @@ public class EditorSession {
     @XmlAttribute
     private void setLabel(String label) {
         this.label = label;
+    }
+
+    /**
+     * Interface
+     * @return
+     */
+    public String getSelectedFile() {
+        return selectedFile;
+    }
+
+    @XmlAttribute
+    private void setSelectedFile(String selectedFile) {
+        this.selectedFile = selectedFile;
     }
 
     /**
@@ -152,11 +166,12 @@ public class EditorSession {
      * 
      * @param filePathList
      */
-    public void updateFilePathList(List<FileInfo> fileInfoList) {
+    public void updateFilePathList(List<FileInfo> fileInfoList, String selectedFile) {
         if (getIsSnapshot() || fileInfoList.size() == 0) {
             return;
         }
         this.fileInfoList = fileInfoList;
+        this.selectedFile = selectedFile;
     }
 
     /**
@@ -173,10 +188,11 @@ public class EditorSession {
      * @param fileInfoList
      */
     public void createEditorSessionData(Boolean keepAlpha, Boolean isSanpshot,
-        List<FileInfo> fileInfoList) {
+        List<FileInfo> fileInfoList, String selectedFile) {
         this.isSnapshot = isSanpshot;
         this.keepAlphabetical = keepAlpha;
         this.fileInfoList = fileInfoList;
+        this.selectedFile = selectedFile;
     }
 
     /**
@@ -213,9 +229,11 @@ public class EditorSession {
      * isSanpshot is also true.
      */
     public void updateEditorSessionData(Boolean keepAlpha, Boolean isSanpshot,
-        List<FileInfo> originalList, List<FileInfo> newList, Boolean updateSnapShot) {
+        List<FileInfo> originalList, List<FileInfo> newList, Boolean updateSnapShot, 
+        String selectedFile) {
         this.isSnapshot = isSanpshot;
         this.keepAlphabetical = keepAlpha;
+        this.selectedFile = selectedFile;
         // If all the editor windows are closed, set orignalList and exit
         // no matter what.
         // Identical effect as updateFilePathList(...);

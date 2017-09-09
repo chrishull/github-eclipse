@@ -10,6 +10,7 @@
  */
 package co.spillikin.tools.eclipse.editortabs.handlers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import org.eclipse.core.commands.ExecutionException;
@@ -22,7 +23,7 @@ import co.spillikin.tools.eclipse.editortabs.model.FileInfo;
 import co.spillikin.tools.eclipse.editortabs.model.SessionMap;
 import co.spillikin.tools.eclipse.editortabs.ui.CreateUpdateDialog;
 import co.spillikin.tools.eclipse.editortabs.util.DataUtil;
-import co.spillikin.tools.eclipse.editortabs.util.InitializerUtil;
+import co.spillikin.tools.eclipse.editortabs.util.FailsafeUtil;
 import co.spillikin.tools.eclipse.editortabs.util.PluginUtil;
 
 import static co.spillikin.tools.eclipse.editortabs.Constants.*;
@@ -63,11 +64,11 @@ public class CreateUpdate {
 
         // The init util will display needed errors to the user if it fails.
         // Init all handlers like this.
-        InitializerUtil iu = null;
+        FailsafeUtil iu = null;
         try {
-            iu = InitializerUtil.getInstance(s);
+            iu = FailsafeUtil.getInstance(s);
         } catch (Exception e) {
-            return;
+            throw new ExecutionException(e.getMessage());
         }
         PluginUtil plugin = iu.getPluginContainer();
         DataUtil pluginData = iu.getDataContainer();
@@ -88,15 +89,31 @@ public class CreateUpdate {
         EditorSession session = sessionMap.getCurrentEditorSession();
         String currentSessionName = sessionMap.getCurrentSessionName();
 
+        // If creating we need to show the list of open tabs as a popup
+        // else we show number of tabs witin session being updated.
+        List<String> tabNames = new ArrayList<>();
+
+        if (create) {
+            for (FileInfo fi : newList) {
+                tabNames.add(fi.getFileName());
+            }
+        } else {
+            for (FileInfo fi : session.getFileInfoList()) {
+                tabNames.add(fi.getFileName());
+            }
+
+        }
+
         // Determine how to put up our dialog.
         CreateUpdateDialog dialog = null;
         ResourceBundle bundle = plugin.getResourceBundle();
         // If the name is not null, create dialog with default settings
         // that are a copy of the current session.
         if (currentSessionName != null) {
+
             // session will likewise not be null.
             // Create a new copy, or Update an existing session.
-            dialog = new CreateUpdateDialog(s, bundle, create, currentSessionName,
+            dialog = new CreateUpdateDialog(s, bundle, tabNames, create, currentSessionName,
                 session.getIsSnapshot(), session.getKeepAlphabetical(),
                 session.numToBeAdded(newList), session.numToBeDeleted(newList),
                 session.isIdentical(newList));
@@ -110,7 +127,7 @@ public class CreateUpdate {
                 return;
             }
             // Create a new session. There is no default so not copying.
-            dialog = new CreateUpdateDialog(s, plugin.getResourceBundle());
+            dialog = new CreateUpdateDialog(s, plugin.getResourceBundle(), tabNames);
         }
         dialog.create();
 
@@ -139,7 +156,7 @@ public class CreateUpdate {
                 sessionMap.switchEditorSession(newSessionName);
                 session = sessionMap.getCurrentEditorSession();
                 session.createEditorSessionData(dialog.getKeepAlphabetical(),
-                    dialog.getIsSnapshot(), plugin.getOpenFileList());
+                    dialog.getIsSnapshot(), plugin.getOpenFileList(), plugin.getSelectedEditor());
 
                 // If we want to save only, then switch back to previous session.
                 if (dialog.getSaveonly()) {
@@ -193,8 +210,8 @@ public class CreateUpdate {
                 session = sessionMap.getCurrentEditorSession();
                 // Finally Update.  See method and unit test for details.
                 session.updateEditorSessionData(dialog.getKeepAlphabetical(),
-                    dialog.getIsSnapshot(), originalFiles, newList,
-                    dialog.getUpdateSnapshot());
+                    dialog.getIsSnapshot(), originalFiles, newList, dialog.getUpdateSnapshot(),
+                    plugin.getSelectedEditor());
 
                 // If the old group name is the same as previous group then
                 // set previous group to this new name

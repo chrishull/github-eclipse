@@ -50,6 +50,8 @@ public class SelectGroupDialog extends TitleAreaDialog {
     Boolean okPressed = false;
     // The selected group name from the Combo.
     private String selectedSessionName = null;
+    // The current group name for display in dialog
+    private String currentGroupName = null;
     // Alpahbetize on open
     Boolean keepAlphabetical;
     // Update continuously or snapshot.
@@ -81,6 +83,8 @@ public class SelectGroupDialog extends TitleAreaDialog {
         if (selectedSessionName == null) {
             selectedSessionName = sessionMap.getSessionNames().iterator().next();
         }
+        // Finally just get the current name
+        currentGroupName = sessionMap.getCurrentSessionName();
     }
 
     /**
@@ -114,6 +118,17 @@ public class SelectGroupDialog extends TitleAreaDialog {
         GridLayout layout = new GridLayout(2, false);
         container.setLayout(layout);
 
+        // Only show the current group name if there is one.
+        if (currentGroupName != null) {
+            // Description to the left of the currently selected group
+            Label lbCurrentGroupLeft = new Label(container, SWT.NONE);
+            lbCurrentGroupLeft.setText(resBundle.getString(SELECT_CURRENT_GROUP_DESCRIPTION_KEY));
+            // The currently selected group to it's right.
+            Label lbCurrentGroupRight = new Label(container, SWT.NONE);
+            lbCurrentGroupRight.setText(currentGroupName);
+        }
+
+        // The popup menu and it's associate description text
         createGroupsPopup(container);
 
         // Label to the left of the alpha check box

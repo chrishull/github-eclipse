@@ -48,7 +48,7 @@ public class AlphaTest {
         // Create a new session and make it the current one.
         session = sessionMap.switchEditorSession("Session 1");
         // Mark to alpha and no snapshot.  Add files that are not in alpha order.
-        session.createEditorSessionData(true, false, fileInfoList);
+        session.createEditorSessionData(true, false, fileInfoList, "selected thing");
         // Extract and check for order.
         // Get the list.  Should be alphabetical
         List<FileInfo> fl = session.getFileInfoList();
@@ -67,7 +67,7 @@ public class AlphaTest {
         // Create a new session and make it the current one.
         session = sessionMap.switchEditorSession("Session 1");
         // Mark to NOT alpha and no snapshot.  Add files that are not in alpha order.
-        session.createEditorSessionData(false, false, fileInfoList);
+        session.createEditorSessionData(false, false, fileInfoList, "selected thing");
         // Extract and check for order.
         // Get the list.  Should be alphabetical
         List<FileInfo> fl = session.getFileInfoList();

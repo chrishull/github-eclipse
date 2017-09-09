@@ -64,7 +64,7 @@ public class DataUtil {
         }
         return instance;
     }
-    
+
     /**
      * USED BY the InitializationUtil during data import.
      * No one else should call this.
@@ -75,12 +75,10 @@ public class DataUtil {
      * @param the original DataUtil reference.
      * @return
      */
-    static DataUtil importData(String workspaceName, String dataFilePath,
-        DataUtil oldUtil ) {
+    static DataUtil importData(String workspaceName, String dataFilePath, DataUtil oldUtil) {
         instance = new DataUtil(workspaceName, dataFilePath, oldUtil);
         return instance;
     }
-    
 
     /**
      * For Testing Only
@@ -114,12 +112,23 @@ public class DataUtil {
      * INITIALIZE must have been called first, done by the Accessor at plugin start.
      * See above.
      * Any part of the plugin can access state information here.
+     * If the EditorSessionData layer got an error when trying to deserialize
+     * then an exception will be thrown here.
      * 
      * @return DataContainer
      */
     public static DataUtil getInstance() throws TabsPluginException {
+
+        // We should have been initialized by now.  
+        // This gets caught by FailsafeUtil and posted as an error dialog.
         if (instance == null) {
             throw new TabsPluginException(EX_PLUGIN_CANT_FIND_DATA);
+        }
+        // If Accessor got an error when loading, throw
+        TabsPluginException ex = instance.editorSessionData.getDataException();
+        if (ex != null) {
+            throw ex;
+
         }
         return instance;
     }
@@ -141,9 +150,12 @@ public class DataUtil {
 
     /**
      * Initialize this DataContainer singleton by loading
-     * and instantiating the underlying EditorSessionsDataImpl.
-     * Then set EditorSessionsDataImpl to work with whatever the
+     * and instantiating the underlying EditorSessionsData.
+     * Then set EditorSessionsData to work with whatever the
      * current Workspace is.
+     * 
+     * This is possibly deserialized JAXB.  If no file exists 
+     * (will happen the first time) an exception will take place
      * 
      * @param workspaceName
      * @param dataFilePath.  Full path.
@@ -154,14 +166,11 @@ public class DataUtil {
         this.currentWorkspaceName = workspaceName;
         this.dataFilePath = dataFilePath;
         editorSessionData = Builder.load(dataFilePath);
-        if (editorSessionData == null) {
-            editorSessionData = new EditorSessionsData();
-        }
         currentSessionMap = editorSessionData.getSessionMap(workspaceName);
     }
 
     /**
-     * This is used for Importing data.  It asumes that a DataUtil 
+     * This is used for Importing data.  It assumes that a DataUtil 
      * was created by the Activator, and the user wished to import
      * a data file.  It will load that file, but then switch
      * back to the file location used to initialize in the first place.
@@ -172,13 +181,10 @@ public class DataUtil {
     private DataUtil(String workspaceName, String dataFilePath, DataUtil oldUtil) {
         this.currentWorkspaceName = workspaceName;
         editorSessionData = Builder.load(dataFilePath);
-        if (editorSessionData == null) {
-            editorSessionData = new EditorSessionsData();
-        }
         currentSessionMap = editorSessionData.getSessionMap(workspaceName);
         this.dataFilePath = oldUtil.dataFilePath;
     }
-    
+
     /**
      * TESTING ONLY
      * This constructor is used by the unit tests only.

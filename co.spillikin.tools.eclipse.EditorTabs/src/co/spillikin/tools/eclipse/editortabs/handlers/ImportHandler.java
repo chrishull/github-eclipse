@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import co.spillikin.tools.eclipse.editortabs.TabsPluginException;
 import co.spillikin.tools.eclipse.editortabs.util.DataUtil;
-import co.spillikin.tools.eclipse.editortabs.util.InitializerUtil;
+import co.spillikin.tools.eclipse.editortabs.util.FailsafeUtil;
 
 /**
  * Export function
@@ -39,11 +39,11 @@ public class ImportHandler {
         // The init util will display needed errors to the user if it fails.
         // Init all handlers like this. DataModel and Plugin guaranteed to be 
         // valid if this passes.
-        InitializerUtil iu = null;
+        FailsafeUtil iu = null;
         try {
-            iu = InitializerUtil.getInstance(s);
+            iu = FailsafeUtil.getInstance(s);
         } catch (Exception e) {
-            return;
+            throw new ExecutionException(e.getMessage());
         }
         ResourceBundle bundle = iu.getPluginContainer().getResourceBundle();
 
@@ -56,7 +56,7 @@ public class ImportHandler {
                 .toString();
             // Like above, if this fails alerts will be posted to the user.
             try {
-                iu = InitializerUtil.importData(s, workspacePath, fullPath,
+                iu = FailsafeUtil.importData(s, workspacePath, fullPath,
                     iu.getDataContainer());
             } catch (TabsPluginException e) {
                 return;

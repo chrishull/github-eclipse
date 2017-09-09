@@ -55,7 +55,7 @@ public class NumbersTest {
         // Create a new session and make it the current one.
         session = sessionMap.switchEditorSession("Session 1");
         // Add the first set of files
-        session.createEditorSessionData(false, false, fileInfoList1);
+        session.createEditorSessionData(false, false, fileInfoList1, "sel");
         // The second file list should have two new entries
         Assert.assertEquals(4, session.numToBeAdded(fileInfoList2));
     }
@@ -65,7 +65,7 @@ public class NumbersTest {
         // Create a new session and make it the current one.
         session = sessionMap.switchEditorSession("Session 1");
         // Add the first set of files
-        session.createEditorSessionData(false, false, fileInfoList1);
+        session.createEditorSessionData(false, false, fileInfoList1, "sel");
         // The second file list should have two new entries
         Assert.assertEquals(2, session.numToBeDeleted(fileInfoList2));
     }
@@ -73,7 +73,7 @@ public class NumbersTest {
     @Test
     public void testEquality() {
         session = sessionMap.switchEditorSession("Session 1");
-        session.createEditorSessionData(false, false, fileInfoList1);
+        session.createEditorSessionData(false, false, fileInfoList1, "sel");
         Assert.assertEquals(false, session.isIdentical(fileInfoList2));
         Assert.assertEquals(true, session.isIdentical(fileInfoList1));
     }
@@ -81,7 +81,7 @@ public class NumbersTest {
     @Test
     public void testEqualityReversed() {
         session = sessionMap.switchEditorSession("Session 1");
-        session.createEditorSessionData(false, false, fileInfoList2);
+        session.createEditorSessionData(false, false, fileInfoList2, "sel");
         Assert.assertEquals(false, session.isIdentical(fileInfoList1));
         Assert.assertEquals(true, session.isIdentical(fileInfoList2));
     }

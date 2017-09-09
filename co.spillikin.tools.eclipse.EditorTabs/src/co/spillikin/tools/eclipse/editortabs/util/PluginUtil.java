@@ -10,6 +10,8 @@
  */
 package co.spillikin.tools.eclipse.editortabs.util;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +22,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorDescriptor;
@@ -37,6 +40,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.core.runtime.Platform;
 
 import co.spillikin.tools.eclipse.editortabs.TabsPluginException;
 import co.spillikin.tools.eclipse.editortabs.model.FileInfo;
@@ -89,11 +93,14 @@ public class PluginUtil {
      * elements access this utility after initialization has failed.
      */
     private PluginUtil() throws TabsPluginException {
+
         try {
             resBundle = ResourceBundle.getBundle(RESOURCE_FILE_NAME);
-        } catch (Exception e) {
-            throw new TabsPluginException(e.getMessage());
+            // Catch anything and repackage.  Used by FailsafeUtil
+        } catch (Throwable e) {
+            throw new TabsPluginException(e);
         }
+
     }
 
     /**
@@ -106,35 +113,35 @@ public class PluginUtil {
     }
 
     /**
+     * Given a full path String, open a file in an editor.
+     * @param pathStr
+     * @return
+     */
+    public boolean openFile(String pathStr) {
+
+        Path path = new Path(pathStr);
+        IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
+        IWorkbenchPage workbenchPage = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+            .getActivePage();
+        IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
+        IEditorDescriptor desc = editorRegistry.getDefaultEditor(file.getName());
+        try {
+            workbenchPage.openEditor(new FileEditorInput(file), desc.getId());
+        } catch (PartInitException e) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Given an FileInfo, open it up in one of the Eclipse editor windows
      * and attempt to reposition the cursor.
      * @param file
      * @return true if success, false if fail.
      */
-    private boolean openFile(FileInfo fileInfo) {
+    public boolean openFile(FileInfo fileInfo) {
 
-        Path path = new Path(fileInfo.getFullPath());
-        // May need to check bounds
-        ITextSelection currrentTextSelection = null;
-        try {
-            currrentTextSelection = getTextSelectionForPath(fileInfo.getFullPath());
-        } catch (PartInitException | BadLocationException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-            return false;
-        }
-
-        IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
-
-        IWorkbenchPage workbenchPage = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-            .getActivePage();
-        IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
-
-        IEditorDescriptor desc = editorRegistry.getDefaultEditor(file.getName());
-        try {
-            workbenchPage.openEditor(new FileEditorInput(file), desc.getId());
-        } catch (PartInitException e) {
-            e.printStackTrace();
+        if (!openFile(fileInfo.getFullPath())) {
             return false;
         }
 
@@ -144,8 +151,6 @@ public class PluginUtil {
             try {
                 setTextSelectionForFile(fileInfo);
             } catch (PartInitException | BadLocationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
                 return false;
             }
         }
@@ -153,11 +158,13 @@ public class PluginUtil {
     }
 
     /**
-     * Given a path relative to a Project (IPath), find an IFile and open it.
+     * Open all the FileInfo in a list in the Eclipse editor window.
+     * Select the given current editor (or don't if null)
+     * 
      * @param FileInfo
      * @return
      */
-    public boolean openFileList(List<FileInfo> fileInfoList) {
+    public boolean openFileList(List<FileInfo> fileInfoList, String filePath) {
 
         boolean retVal = true;
         for (FileInfo fi : fileInfoList) {
@@ -165,13 +172,17 @@ public class PluginUtil {
                 retVal = false;
             }
         }
+        selectEditor(filePath);
         return retVal;
     }
 
     /**
-     * Get a list of currently open files
+     * Get a list of currently open editor files.
+     * Returns a "native" Eclipse PDE list of IFile.
+     * 
+     * @return List<IFile>
      */
-    private List<IFile> getOpenFlieList() {
+    public List<IFile> getOpenEclipseEditorFileList() {
 
         List<IFile> fileList = new ArrayList<IFile>();
         IEditorReference[] erList = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
@@ -181,8 +192,7 @@ public class PluginUtil {
             try {
                 ei = er.getEditorInput();
             } catch (PartInitException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
+                // nothing to do
             }
             if (ei != null) {
                 IFile file = getFileFromEditorInput(ei);
@@ -193,65 +203,141 @@ public class PluginUtil {
     }
 
     /**
-     * Return an alphabetized list of paths.
-     * This may not be very interesting as the intent here is
-     * to alphabetize the file names.
-     * @return
+     * Return the open set of files as a list of FileInfo, complete
+     * with cursor position information.
+     * 
+     * @return List<FileInfo>
      */
     public List<FileInfo> getOpenFileList() {
-        List<IFile> fileList = getOpenFlieList();
+        List<IFile> fileList = getOpenEclipseEditorFileList();
         List<FileInfo> fileInfoList = new ArrayList<FileInfo>();
         for (IFile file : fileList) {
-            String fullPath = file.getFullPath().toString();
-            String name = file.getName();
-            ITextSelection selection = null;
-            try {
-                selection = getTextSelectionForPath(fullPath);
-            } catch (PartInitException | BadLocationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            // If we got an error or it came back null, set to 
-            // empty so we won't attempt to select.
-            if (selection == null) {
-                selection = new ITextSelection() {
-                    @Override
-                    public boolean isEmpty() {
-                        return true;
-                    }
-
-                    @Override
-                    public int getEndLine() {
-                        return 0;
-                    }
-
-                    @Override
-                    public int getLength() {
-                        return 0;
-                    }
-
-                    @Override
-                    public int getOffset() {
-                        return 0;
-                    }
-
-                    @Override
-                    public int getStartLine() {
-                        return 0;
-                    }
-
-                    @Override
-                    public String getText() {
-                        return null;
-                    }
-                };
-            }
-            FileInfo fi = new FileInfo(name, fullPath, selection.getStartLine(),
-                selection.getEndLine(), selection.getOffset(), selection.getLength(),
-                selection.getText(), selection.isEmpty());
+            FileInfo fi = iFileToFileInfo(file);
             fileInfoList.add(fi);
         }
         return fileInfoList;
+    }
+
+    /**
+     * Get the currently selected editor as a full path.
+     * May return null if all editors are closed.
+     */
+    public String getSelectedEditor() {
+        IWorkbenchPage workbenchPage = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+            .getActivePage();
+        IEditorPart p = workbenchPage.getActiveEditor();
+        // If no editors are opened p will be null.
+        if (p == null) {
+            return null;
+        }
+        IEditorInput ei = p.getEditorInput();
+        IFile file = getFileFromEditorInput(ei);
+        if (file == null) {
+            return null;
+        }
+        return file.getFullPath().toString();
+    }
+
+    /**
+     * Select the given editor tab as idendified by it's full path.
+     * Must be open.  May not work but fails gracefully.
+     * 
+     * @param filePath  Unique ID for editor.
+     */
+    public void selectEditor(String filePath) {
+        if (filePath == null) {
+            return;
+        }
+        IWorkbenchPage workbenchPage = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+            .getActivePage();
+        IEditorReference[] erList = workbenchPage.getEditorReferences();
+        // Loop thru editor references and try to match path.
+        for (IEditorReference er : erList) {
+
+            IEditorInput ei = null;
+
+            try {
+                ei = er.getEditorInput();
+            } catch (PartInitException e1) {
+                // nothing to do
+                return;
+            }
+            if (ei != null) {
+                IFile file = getFileFromEditorInput(ei);
+                String path = file.getFullPath().toString();
+                if (path.equals(filePath)) {
+                    // Returns the editor referenced by this object. Returns null 
+                    // if the editor was not instantiated or it failed to be restored. 
+                    // Tries to restore the editor if restore is true.
+                    IEditorPart ep = er.getEditor(false);
+                    if (ep == null) {
+                        return;
+                    }
+                    workbenchPage.activate(ep);
+                    // redundant?
+                    // ep.setFocus();
+
+                    return;
+                }
+            }
+        }
+    }
+
+    /**
+     * Convert an Eclipse IFile to a FileInfo object.
+     * 
+     * @param file
+     * @return
+     */
+    private FileInfo iFileToFileInfo(IFile file) {
+
+        String fullPath = file.getFullPath().toString();
+        String name = file.getName();
+        ITextSelection selection = null;
+        try {
+            selection = getTextSelectionForPath(fullPath);
+        } catch (PartInitException | BadLocationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        // If we got an error or it came back null, set to 
+        // empty so we won't attempt to select.
+        if (selection == null) {
+            selection = new ITextSelection() {
+                @Override
+                public boolean isEmpty() {
+                    return true;
+                }
+
+                @Override
+                public int getEndLine() {
+                    return 0;
+                }
+
+                @Override
+                public int getLength() {
+                    return 0;
+                }
+
+                @Override
+                public int getOffset() {
+                    return 0;
+                }
+
+                @Override
+                public int getStartLine() {
+                    return 0;
+                }
+
+                @Override
+                public String getText() {
+                    return null;
+                }
+            };
+        }
+        return new FileInfo(name, fullPath, selection.getStartLine(), selection.getEndLine(),
+            selection.getOffset(), selection.getLength(), selection.getText(), selection.isEmpty());
+
     }
 
     /**
@@ -306,11 +392,13 @@ public class PluginUtil {
                 // if we found it, get it's ITextSelection
                 String p = file.getFullPath().toString();
                 if (fullPath.equals(p)) {
-                    IEditorPart editorPart = (IEditorPart) editorRef.getPart(false);
-                    if (editorPart == null) {
-                        return null;
+                    // Don't assume we get a IEditorPart
+                    Object ep = editorRef.getPart(false);
+                    if (ep instanceof IEditorPart) {
+                        IEditorPart editorPart = (IEditorPart) ep;
+                        return editorPart.getSite().getSelectionProvider();
                     }
-                    return editorPart.getSite().getSelectionProvider();
+                    return null;
                 }
             }
         }
@@ -322,7 +410,11 @@ public class PluginUtil {
      * save off the selected text ares / cursor location 
      * so we can set it when we reopen.
      * 
-     * @param Full path to file (used as a unique ID).
+     * @param Full path to file.  Used to get the SelectionProvider
+     * and from there the ITextSelection for that full path.
+     * 
+     * @return ITextSelection.  If not null this info will be 
+     * moved to the associated FileInfo.
      * 
      * @throws PartInitException
      * @throws BadLocationException
@@ -331,19 +423,28 @@ public class PluginUtil {
         throws PartInitException, BadLocationException {
 
         ISelectionProvider is = getSelectionProviderForPath(fullPath);
-        if (is == null) {
-            return null;
+
+        if (is != null) {
+            // This can come back as TreeSelection, causing a classCastException
+            // This caused an intermittent mystery error for a while.
+            Object selection = is.getSelection();
+            if (selection instanceof ITextSelection) {
+                return (ITextSelection) selection;
+            }
         }
-        return (ITextSelection) is.getSelection();
+        return null;
 
     }
 
     /**
-     * For a given open file, return it's ITextSelection so we can 
-     * save off the selected text ares / cursor location 
-     * so we can set it when we reopen.
+     * After opening a file in an editor, position the cursor and
+     * selection area based on data found in FileInfo.
+     * We convert a FileInfo back to an ITextSelection and set that 
+     * selection based on the full path found in the FileInfo.
      * 
-     * @param Full path to file (used as a unique ID).
+     * @param fi  FileInfo associated with an already opened file.
+     * @return False if for some reason we couldn't get the selection
+     * provider.  Harmless. We just won't set the cursor in that case.
      * 
      * @throws PartInitException
      * @throws BadLocationException
@@ -437,9 +538,37 @@ public class PluginUtil {
      * @param errorMessage
      */
     public static void postFatalAlertStatic(Shell s, String errorMessage) {
-        MessageDialog.openError(s, "A Fatal Error Has Occurred",
-            "Needed resources could not be found.  and " + errorMessage + " Exiting.");
+        MessageDialog.openError(s, "A Fatal Error Has Occurred", errorMessage);
         return;
+    }
+
+    /**
+     * Utility displays alrrt showing all info associated with the given exception and 
+     * logs it to the platform log.  The location of the log is
+     * also displayed in the alert bos.
+     * @param s
+     * @param e
+     */
+    public static void postAndLogException(Shell s, Exception e) {
+
+        // Convert the exception's message and stack trace into a String
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        StringBuffer stackTraceSb = new StringBuffer(sw.toString());
+        if (stackTraceSb.length() > 1024) {
+            stackTraceSb.setLength(1024);
+            stackTraceSb.append("(trimmed)...");
+        }
+        String exMessage = "Exception type: " + e.getClass().toString() + "\n" + "Message: "
+            + e.getMessage() + "\n" + "Stacktrace:\n " + stackTraceSb.toString();
+
+        new Status(Status.ERROR, "co.spillikin.editortabs", exMessage);
+        exMessage = exMessage + "\n\n" + "Logfile location: "
+            + Platform.getLogFileLocation().toString() + "\n"
+            + "Please report this error to: chrishull42@gmail.com";
+        postFatalAlertStatic(s, exMessage);
+
     }
 
     public static IFile getFileFromEditorInput(IEditorInput input) {
@@ -456,12 +585,7 @@ public class PluginUtil {
         return ResourcesPlugin.getWorkspace().getRoot().getFile(path);
     }
 
-    /**
-     * ==========================================================
-     * SPARE PARTS???
-     */
-
-    public static IPath getPathFromEditorInput(IEditorInput input) {
+    private static IPath getPathFromEditorInput(IEditorInput input) {
 
         if (input instanceof ILocationProvider)
             return ((ILocationProvider) input).getPath(input);

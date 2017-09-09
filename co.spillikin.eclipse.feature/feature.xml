@@ -5,15 +5,28 @@
       version="1.0.0.qualifier">
 
    <description url="http://www.example.com/description">
-      [Enter Feature Description here.]
+      Spillikin Aerospace file tab plugin for Eclipse.
    </description>
 
    <copyright url="http://www.example.com/copyright">
-      [Enter Copyright Description here.]
+      (c) 2017 Spillikin Aerospace
    </copyright>
 
    <license url="http://www.example.com/license">
-      [Enter License Description here.]
+This is beta software, feel free to share.  
+
+If you are upgrading be sure to export your existing sessions first, then import them back using the updated plugin.
+
+Please send mail to me at chrishull42@gmail.com and put "Editor Sessions Plugin" in the subject line to make comments or report bugs.
+
+For full instructions see http://chrishull.com/projects/eclipse  You may review the source here at http://github.com/chrishull/github-eclipse
+
+Thanks;
+-Chris
+http://chrishull.com
+
+
+   
    </license>
 
    <plugin

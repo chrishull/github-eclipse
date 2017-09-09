@@ -19,7 +19,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 
 import co.spillikin.tools.eclipse.editortabs.util.DataUtil;
-import co.spillikin.tools.eclipse.editortabs.util.InitializerUtil;
+import co.spillikin.tools.eclipse.editortabs.util.FailsafeUtil;
 import co.spillikin.tools.eclipse.editortabs.util.PluginUtil;
 
 /**
@@ -39,11 +39,11 @@ public class DeleteHandler {
 
         // The init util will display needed errors to the user if it fails.
         // Init all handlers like this.
-        InitializerUtil iu = null;
+        FailsafeUtil iu = null;
         try {
-            iu = InitializerUtil.getInstance(s);
+            iu = FailsafeUtil.getInstance(s);
         } catch (Exception e) {
-            return;
+            throw new ExecutionException(e.getMessage());
         }
         PluginUtil plugin = iu.getPluginContainer();
         DataUtil fgData = iu.getDataContainer();

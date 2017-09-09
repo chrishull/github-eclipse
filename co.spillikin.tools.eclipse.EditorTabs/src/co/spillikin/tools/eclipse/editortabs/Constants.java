@@ -42,6 +42,13 @@ public class Constants {
     public static final String CREATE_SESSION_NAME_DESCRIPTION_KEY = "create_session_name_description";
     public static final String UPDATE_SESSION_NAME_DESCRIPTION_KEY = "update_session_name_description";
 
+    // Number of tabs text to the left
+    public static final String CREATE_NUM_TABS_DESCRIPTION_KEY = "create_num_tabs_description";
+    public static final String UPDATE_NUM_TABS_DESCRIPTION_KEY = "update_num_tabs_description";
+   // Combo or something on the right which shows actual names.
+    public static final String TAB_NAMES_LIST_DESCRIPTION_KEY = "tab_names_list_description";
+    
+    
     // Checkbox titles.  Descriptions appear to the left of the checkbox
     // and give more detail
     public static final String ALPHA_CHECKBOX_KEY = "alpha_checkbox";
@@ -64,7 +71,9 @@ public class Constants {
     public static final String SELECT_TITLE_KEY = "select_title";
     public static final String SELECT_DESCRIPTION_KEY = "select_description";
     public static final String SELECT_SESSION_NAME_DESCRIPTION_KEY = "select_session_name_description";
-
+    // Currently selected group description
+    public static final String SELECT_CURRENT_GROUP_DESCRIPTION_KEY = "select_current_group_description";
+    
     // Import and Export Dialogs
     public static final String EXPORT_TITLE_KEY = "export_title";
     public static final String EXPORT_MESSAGE_KEY = "export_message";

@@ -41,9 +41,9 @@ public class EmptyListTest {
         // Create a new session and make it the current one.
         session = sessionMap.switchEditorSession("Session 1");
         // Add the first set of files, establish the snap shot.
-        session.createEditorSessionData(false, false, fileInfoList1);
+        session.createEditorSessionData(false, false, fileInfoList1, "sel");
         // Update with a new set of files, should not happen.
-        session.updateFilePathList(emptyList);
+        session.updateFilePathList(emptyList, "fake current tab");
         // Check to see whose there
         List<FileInfo> fList = session.getFileInfoList();
         // Array length should be 1

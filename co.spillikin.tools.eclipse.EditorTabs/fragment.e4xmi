@@ -16,6 +16,10 @@
     xmi:id="co.spillikin.command.import" 
     elementId="spillikin.handler.ImportCommand" 
     commandName="Import Session Data"/>
+    <elements xsi:type="commands:Command" 
+    xmi:id="co.spillikin.command.alpha" 
+    elementId="spillikin.handler.AlphaCommand" 
+    commandName="Alphabetize Tabs"/>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_fW12kIrOEeW7h_qdP9N9fw" featurename="handlers" parentElementId="xpath:/">
     <elements xsi:type="commands:Handler" xmi:id="co.spillikin.handler.create" elementId="org.eclipse.pde.ui.templates.handler.0" contributionURI="bundleclass://co.spillikin.tools.eclipse.EditorTabs/co.spillikin.tools.eclipse.editortabs.handlers.CreateHandler" command="co.spillikin.command.create"/>
@@ -36,6 +40,11 @@
     elementId="org.eclipse.pde.ui.templates.handler.5" 
     contributionURI="bundleclass://co.spillikin.tools.eclipse.EditorTabs/co.spillikin.tools.eclipse.editortabs.handlers.ImportHandler" 
     command="co.spillikin.command.import"/>
+    <elements xsi:type="commands:Handler" 
+    xmi:id="co.spillikin.handler.alpha" 
+    elementId="org.eclipse.pde.ui.templates.handler.6" 
+    contributionURI="bundleclass://co.spillikin.tools.eclipse.EditorTabs/co.spillikin.tools.eclipse.editortabs.handlers.AlphaHandler" 
+    command="co.spillikin.command.alpha"/>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_pVgfIIrOEeW7h_qdP9N9fw" featurename="menuContributions" parentElementId="xpath:/">
     <elements xsi:type="menu:MenuContribution" xmi:id="_BducUIrPEeW7h_qdP9N9fw" elementId="org.eclipse.pde.ui.templates.menucontribution.1" positionInParent="after=revert" parentId="file">
@@ -55,6 +64,10 @@
         xmi:id="co.spillikin.mc2.import" 
         elementId="org.eclipse.pde.ui.templates.handledmenuitem.5" label="" 
         iconURI="" command="co.spillikin.command.import"/>
+        <children xsi:type="menu:HandledMenuItem" 
+        xmi:id="co.spillikin.mc2.alpha" 
+        elementId="org.eclipse.pde.ui.templates.handledmenuitem.6" label="" 
+        iconURI="" command="co.spillikin.command.alpha"/>
       </children>
     </elements>
   </fragments>

@@ -23,7 +23,7 @@ import co.spillikin.tools.eclipse.editortabs.model.FileInfo;
 import co.spillikin.tools.eclipse.editortabs.model.SessionMap;
 import co.spillikin.tools.eclipse.editortabs.ui.SelectGroupDialog;
 import co.spillikin.tools.eclipse.editortabs.util.DataUtil;
-import co.spillikin.tools.eclipse.editortabs.util.InitializerUtil;
+import co.spillikin.tools.eclipse.editortabs.util.FailsafeUtil;
 import co.spillikin.tools.eclipse.editortabs.util.PluginUtil;
 
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -45,11 +45,11 @@ public class SelectHandler {
 
         // The init util will display needed errors to the user if it fails.
         // Init all handlers like this.
-        InitializerUtil iu = null;
+        FailsafeUtil iu = null;
         try {
-            iu = InitializerUtil.getInstance(s);
+            iu = FailsafeUtil.getInstance(s);
         } catch (Exception e) {
-            return;
+            throw new ExecutionException(e.getMessage());
         }
         PluginUtil plugin = iu.getPluginContainer();
         DataUtil fgData = iu.getDataContainer();
@@ -97,10 +97,10 @@ public class SelectHandler {
             sessionMap.switchEditorSession(selectedName);
             // Get it from the map and set it's data.  See javadoc for details.
             EditorSession session = sessionMap.getCurrentEditorSession();
-            session.updateEditorSessionButtons( dialog.getKeepAlphabetical(),  
+            session.updateEditorSessionButtons(dialog.getKeepAlphabetical(),
                 dialog.getIsSnapshot());
             // Open all the files associated with the session.
-            plugin.openFileList( session.getFileInfoList() );
+            plugin.openFileList(session.getFileInfoList(), session.getSelectedFile());
             // Finally show the new session dialog.
             MessageDialog.openInformation(s,
                 plugin.getResourceString(INFO_SELECTED_SESSION_TITLE_KEY),

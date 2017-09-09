@@ -23,6 +23,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import co.spillikin.tools.eclipse.editortabs.TabsPluginException;
+
 /**
  * This is the top layer.  It maps a Workspace to a 
  * group of sessions in SessionMap
@@ -59,6 +61,10 @@ public class EditorSessionsData {
 
     // Map of workspaces to map of session names to sessions
     private Map<String, SessionMap> workspaceMap = new HashMap<>();
+
+    // Error state saved when this is deserialized (or not if an error took place)
+    // Retrieved and checked whenever used via UI.
+    private transient TabsPluginException dataException = null;
 
     // Serialization, public, Needed by DataUtil
     public EditorSessionsData() {
@@ -148,4 +154,22 @@ public class EditorSessionsData {
     public void deleteSessionMap(String workspace) {
         workspaceMap.remove(workspace);
     }
+
+    /**
+     * Checked bu the User Interface whenever this object is
+     * accessed.
+     * @return
+     */
+    public TabsPluginException getDataException() {
+        return dataException;
+    }
+
+    /**
+     * Saved off by Load if an error took place.
+     * @param e
+     */
+    public void setDataException(TabsPluginException e) {
+        dataException = e;
+    }
+
 }

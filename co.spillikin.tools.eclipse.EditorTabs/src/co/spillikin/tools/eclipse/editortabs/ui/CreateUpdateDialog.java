@@ -10,7 +10,12 @@
  */
 package co.spillikin.tools.eclipse.editortabs.ui;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
+
+import javax.swing.table.TableColumnModel;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -18,6 +23,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -51,6 +57,8 @@ public class CreateUpdateDialog extends TitleAreaDialog {
     // This will be true only if Update and if there is a difference between
     // existing files and open tabs.
     private Boolean showUpdateSnapshotControl = false;
+    // List of tab names on screen if Create or in group if Update
+    private List<String> tabNames;
     // If ss is to be updated, give use some info
     private int numToAdd = 0;
     private int numToDelete = 0;
@@ -63,14 +71,22 @@ public class CreateUpdateDialog extends TitleAreaDialog {
      * OR update an existing session's information.
      * 
      * @param parentShell
-     * @param currentSessionName, may be null.
+     * @param resBundle
+     * @param numberOfTabs  Tabs currently on screen if create, or 
+     * tabs stored within the session if updating.
+     * @param create  True if making a new session, false if updating existing.
+     * @param currentSessionName
      * @param isSnapshot
      * @param keepAlphabetical
+     * @param numToAdd  Difference between screen and existing session for Update
+     * @param numToDelete  Difference between screen and existing session for Update
+     * @param doNotShowUpdateSnapshotControl
      */
-    public CreateUpdateDialog(Shell parentShell, ResourceBundle resBundle, Boolean create,
-        String currentSessionName, Boolean isSnapshot, Boolean keepAlphabetical, int numToAdd,
-        int numToDelete, Boolean doNotShowUpdateSnapshotControl) {
+    public CreateUpdateDialog(Shell parentShell, ResourceBundle resBundle, List<String> tabNames,
+        Boolean create, String currentSessionName, Boolean isSnapshot, Boolean keepAlphabetical,
+        int numToAdd, int numToDelete, Boolean doNotShowUpdateSnapshotControl) {
         super(parentShell);
+        this.tabNames = tabNames;
         this.create = create;
         this.currentSessionName = currentSessionName;
         this.isSnapshot = isSnapshot;
@@ -89,16 +105,17 @@ public class CreateUpdateDialog extends TitleAreaDialog {
     }
 
     /**
-     * If there is no current session name to default from, use this
-     * constructor.
+     * Create a completely new session.  There is no selected default
+     * to copy from.
      * We are by definition nut updating, so create forced to true.
      * @param parentShell
      * @param resBundle
+     * @param Number of open tabs that will be put in this session.
      */
-    public CreateUpdateDialog(Shell parentShell, ResourceBundle resBundle) {
+    public CreateUpdateDialog(Shell parentShell, ResourceBundle resBundle, List<String> tabNames) {
         // Set "the same" to true to prevent the additional checkbox from 
         // appearing.
-        this(parentShell, resBundle, true, null, false, false, 0, 0, true);
+        this(parentShell, resBundle, tabNames, true, null, false, false, 0, 0, true);
 
     }
 
@@ -164,6 +181,9 @@ public class CreateUpdateDialog extends TitleAreaDialog {
         }
         newSessionNameControl.setText(sn);
 
+        // Create label on left and popup on right to display tab names.
+        createGroupsPopup(container);
+
         // Label to the left of the alpha check box
         Label lbAlpha = new Label(container, SWT.NONE);
         lbAlpha.setText(resBundle.getString(ALPHA_CHECKBOX_DESCRIPTION_KEY));
@@ -188,7 +208,7 @@ public class CreateUpdateDialog extends TitleAreaDialog {
         if (create) {
             // Label to the left of the lbSaveonly check box
             Label lbSaveonly = new Label(container, SWT.NONE);
-            lbSaveonly.setText(resBundle.getString(SAVEONLY_CHECKBOX_DESCRIPTION_KEY) );
+            lbSaveonly.setText(resBundle.getString(SAVEONLY_CHECKBOX_DESCRIPTION_KEY));
 
             // Checkbox to the right
             Button saveonlyToggle = new Button(container, SWT.CHECK);
@@ -203,17 +223,17 @@ public class CreateUpdateDialog extends TitleAreaDialog {
             saveonlyToggle.setSelection(saveonly);
             saveonlyToggle.addListener(SWT.Selection, event -> onSaveonlySelect(saveonlyToggle));
         }
-        
+
         // Update snapshot option
         // This will only be true if 
         // 1: we are in update mode and
         // 2: The open tabs are different from the snapshotted ones.
-        if (showUpdateSnapshotControl ) {
+        if (showUpdateSnapshotControl) {
             // Label to the left of the lbUpdateSs check box
             Label lbUpdateSs = new Label(container, SWT.NONE);
-            lbUpdateSs.setText(numToAdd + " " + resBundle.getString(SSUPDATE_CHECKBOX_DESCRIPTION_1_KEY) + 
-                "\n" + 
-                numToDelete +  " " + resBundle.getString(SSUPDATE_CHECKBOX_DESCRIPTION_2_KEY)  );
+            lbUpdateSs.setText(
+                numToAdd + " " + resBundle.getString(SSUPDATE_CHECKBOX_DESCRIPTION_1_KEY) + "\n"
+                    + numToDelete + " " + resBundle.getString(SSUPDATE_CHECKBOX_DESCRIPTION_2_KEY));
 
             // Checkbox to the right
             Button ssupdateToggle = new Button(container, SWT.CHECK);
@@ -222,6 +242,51 @@ public class CreateUpdateDialog extends TitleAreaDialog {
             ssupdateToggle.addListener(SWT.Selection, event -> onUpdateSsSelect(ssupdateToggle));
         }
 
+    }
+
+    /**
+     * Create our Combo (what the rest of the world calls a popup menu)
+     * which simply allows the user to see the set of tab names via popup.
+     * @param container
+     */
+    private void createGroupsPopup(Composite container) {
+
+        // Label to left of number of currently open tabs or tabs in this group
+        Label lbNumTabs = new Label(container, SWT.NONE);
+        if (create) {
+            lbNumTabs.setText(
+                resBundle.getString(CREATE_NUM_TABS_DESCRIPTION_KEY) + " " + tabNames.size());
+        } else {
+            lbNumTabs.setText(
+                resBundle.getString(UPDATE_NUM_TABS_DESCRIPTION_KEY) + " " + tabNames.size());
+        }
+
+        GridData dataFirstName = new GridData();
+        dataFirstName.grabExcessHorizontalSpace = true;
+        dataFirstName.horizontalAlignment = GridData.FILL;
+
+        // Right side, Combo showing sessions to choose from
+        Combo fileListShowCombo = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+
+        String[] namesArr = new String[tabNames.size()];
+        namesArr = tabNames.toArray(namesArr);
+
+        Arrays.sort(namesArr);
+
+        fileListShowCombo.add(resBundle.getString(TAB_NAMES_LIST_DESCRIPTION_KEY));
+
+        for (String name : namesArr) {
+            fileListShowCombo.add(name);
+        }
+        fileListShowCombo.select(0);
+        fileListShowCombo.addListener(SWT.Selection, event -> onListShow(fileListShowCombo));
+
+    }
+
+    // When the Combo that simply shows the list of files is used, force
+    // it back to selecting the first item.
+    private void onListShow(Combo c) {
+        c.select(0);
     }
 
     // When the user clicks the alpha checkbox update.
@@ -243,7 +308,7 @@ public class CreateUpdateDialog extends TitleAreaDialog {
     private void onUpdateSsSelect(Button cb) {
         updateSnapshot = cb.getSelection();
     }
-    
+
     /**
      * Must copy out text from control as it will go away.
      */
@@ -291,7 +356,7 @@ public class CreateUpdateDialog extends TitleAreaDialog {
     public Boolean getSaveonly() {
         return this.saveonly;
     }
-    
+
     /**
      * Return true if we are to set the current 
      * fille tab set to this session.

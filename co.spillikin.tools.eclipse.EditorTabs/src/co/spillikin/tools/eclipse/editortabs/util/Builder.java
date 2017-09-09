@@ -16,6 +16,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import co.spillikin.tools.eclipse.editortabs.TabsPluginException;
 import co.spillikin.tools.eclipse.editortabs.model.EditorSessionsData;
 
 /**
@@ -32,7 +33,7 @@ public class Builder {
      * @param editorData
      */
     public static void save(EditorSessionsData sessionsData) {
-        save(sessionsData, "editordata.xml");
+        save(sessionsData, "editordatatest.xml");
     }
 
     /**
@@ -61,10 +62,15 @@ public class Builder {
     }
 
     /**
-     * Retrieve our data from an XML file.
+     * Retrieve our data from an XML file.  This function is called 
+     * when the plugin is initializing and does not have a face.  So if we
+     * get an exception we store it in the return struct EditorSessionsData.
+     * This will be picked up later and displayed to the user when they try to 
+     * use the plugin.
+     * 
      * @param filePath
-     * @return  If null came back something went wrong.
-     * Remember, the first time thru there will be no data.
+     * @return  EditorSessionsData, will not be null.  Check for error
+     * status whenever this object is retrieved for use.
      */
     public static EditorSessionsData load(String filePath) {
 
@@ -72,27 +78,24 @@ public class Builder {
         try {
 
             File file = new File(filePath);
-            // Use Impl.  JAXB doesn't handle interfaces.
+            // If the file does not exist, simply return NULL.
+            if (!file.exists()) {
+                return new EditorSessionsData();
+            }
+
+            // Use Impl.  (BTW, JAXB doesn't handle interfaces.)
             JAXBContext jaxbContext = JAXBContext.newInstance(EditorSessionsData.class);
 
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
             sessionsData = (EditorSessionsData) jaxbUnmarshaller.unmarshal(file);
 
-        } catch (JAXBException e) {
-            // We land here the first time thru if there is no file.
-            // This is ok.
-            // System.out.println(e.getMessage());
-            // e.printStackTrace();
-        } catch (Exception e ) {
-            // Something bad happened
-            System.out.println(e.getMessage());
-            e.printStackTrace();
-            return null;
+            // If Anything bad happens, catch and stash
         } catch (Throwable t) {
-            // Something really bad happened
-            System.out.println(t.getMessage());
-            t.printStackTrace();
-            return null;
+            EditorSessionsData eData = new EditorSessionsData();
+
+            eData.setDataException(new TabsPluginException(t));
+            return eData;
+
         }
         return sessionsData;
     }

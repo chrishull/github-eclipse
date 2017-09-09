@@ -77,13 +77,13 @@ public class UpdateTest {
         // Create a new session and make it the current one.
         session = sessionMap.switchEditorSession("Session 1");
         // Continuous update, no snapshot.
-        session.createEditorSessionData(false, false, originalList);
+        session.createEditorSessionData(false, false, originalList, "sel");
         // Get the original list back
         List<FileInfo> listInSession = session.getFileInfoList();
         // Simulate the Update dialog
         // alpha, ss, orig, openTabs, updateIfSs
         session.updateEditorSessionData(false, false,
-            listInSession, openTabsList, false);
+            listInSession, openTabsList, false, "selected session");
         // We should have the new set
         Assert.assertTrue(isOpenTabs(openTabsList));
     }
@@ -98,13 +98,13 @@ public class UpdateTest {
         // Create a new session and make it the current one.
         session = sessionMap.switchEditorSession("Session 1");
         // Continuous update, no snapshot.
-        session.createEditorSessionData(false, false, originalList);
+        session.createEditorSessionData(false, false, originalList, "sel");
         // Get the original list back
         List<FileInfo> listInSession = session.getFileInfoList();
         // Simulate the Update dialog
         // alpha, ss, orig, openTabs, updateIfSs
         session.updateEditorSessionData(false, false,
-            listInSession, openTabsListEmpty, true);
+            listInSession, openTabsListEmpty, true, "selected session");
         // We should still have the original list
         Assert.assertTrue(isOriginal());
     }
@@ -119,13 +119,13 @@ public class UpdateTest {
         // Create a new session and make it the current one.
         session = sessionMap.switchEditorSession("Session 1");
         // noAlpha, yes Ss.
-        session.createEditorSessionData(false, true, originalList);
+        session.createEditorSessionData(false, true, originalList, "sel");
         // Get the original list back
         List<FileInfo> listInSession = session.getFileInfoList();
         // Simulate the Update dialog
         // alpha, stail a ss, orig, openTabs, updateIfSs
         session.updateEditorSessionData(false, true,
-            listInSession, openTabsList, true);
+            listInSession, openTabsList, true, "selected session");
         // We should have the new set.
         Assert.assertTrue(isOpenTabs());
     }
@@ -141,13 +141,13 @@ public class UpdateTest {
         // Create a new session and make it the current one.
         session = sessionMap.switchEditorSession("Session 1");
         // noAlpha, yes Ss.
-        session.createEditorSessionData(false, true, originalList);
+        session.createEditorSessionData(false, true, originalList, "sel");
         // Get the original list back
         List<FileInfo> listInSession = session.getFileInfoList();
         // Simulate the Update dialog
         // alpha, stail a ss, orig, openTabs, updateIfSs
         session.updateEditorSessionData(false, true,
-            listInSession, openTabsListEmpty, true);
+            listInSession, openTabsListEmpty, true , "selected session");
         // We should have the new set.
         Assert.assertTrue(isOriginal());
     }
@@ -162,13 +162,13 @@ public class UpdateTest {
         // Create a new session and make it the current one.
         session = sessionMap.switchEditorSession("Session 1");
         // noAlpha, yes Ss.
-        session.createEditorSessionData(false, true, originalList);
+        session.createEditorSessionData(false, true, originalList, "sel");
         // Get the original list back
         List<FileInfo> listInSession = session.getFileInfoList();
         // Simulate the Update dialog
         // alpha, stail a ss, orig, openTabs, updateIfSs
         session.updateEditorSessionData(false, true,
-            listInSession, openTabsList, false);
+            listInSession, openTabsList, false, "selected session");
         // We should have the old set.
         Assert.assertTrue(isOriginal());
     }

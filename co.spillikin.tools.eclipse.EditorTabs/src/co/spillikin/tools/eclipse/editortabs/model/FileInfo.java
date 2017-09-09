@@ -1,5 +1,6 @@
 package co.spillikin.tools.eclipse.editortabs.model;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -45,7 +46,7 @@ public class FileInfo implements Comparable<FileInfo> {
     public Boolean getIsEmpty() {
         return isEmpty;
     }
-    @XmlElement
+    @XmlAttribute
     private void setIsEmpty(Boolean isEmpty) {
         this.isEmpty = isEmpty;
     }
@@ -53,42 +54,42 @@ public class FileInfo implements Comparable<FileInfo> {
     public String getFileName() {
         return fileName;
     }
-    @XmlElement
+    @XmlAttribute
     private void setFileName(String fileName) {
         this.fileName = fileName;
     }
     public String getFullPath() {
         return fullPath;
     }
-    @XmlElement
+    @XmlAttribute
     private void setFullPath(String fullPath) {
         this.fullPath = fullPath;
     }
     public Integer getEndLine() {
         return endLine;
     }
-    @XmlElement
+    @XmlAttribute
     private void setEndLine(Integer endLine) {
         this.endLine = endLine;
     }
     public Integer getLength() {
         return length;
     }
-    @XmlElement
+    @XmlAttribute
     private void setLength(Integer length) {
         this.length = length;
     }
     public Integer getOffset() {
         return offset;
     }
-    @XmlElement
+    @XmlAttribute
     private void setOffset(Integer offset) {
         this.offset = offset;
     }
     public Integer getStartLine() {
         return startLine;
     }
-    @XmlElement
+    @XmlAttribute
     private void setStartLine(Integer startLine) {
         this.startLine = startLine;
     }

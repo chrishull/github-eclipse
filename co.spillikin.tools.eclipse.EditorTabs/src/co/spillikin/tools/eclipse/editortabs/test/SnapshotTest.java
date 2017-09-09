@@ -64,9 +64,9 @@ public class SnapshotTest {
         // Create a new session and make it the current one.
         session = sessionMap.switchEditorSession("Session 1");
         // Add the first set of files, establish the snap shot.
-        session.createEditorSessionData(true, true, fileInfoList1);
+        session.createEditorSessionData(true, true, fileInfoList1, "sel");
         // Update with a new set of files, should not happen.
-        session.updateFilePathList(fileInfoList2);
+        session.updateFilePathList(fileInfoList2, "fake current tab");
         // Check to see whose there
         List<FileInfo> fList = session.getFileInfoList();
         // Array length should be 3
@@ -85,9 +85,9 @@ public class SnapshotTest {
         // Create a new session and make it the current one.
         session = sessionMap.switchEditorSession("Session 1");
         // Add the first set of files, establish the snap shot.
-        session.createEditorSessionData(true, false, fileInfoList1);
+        session.createEditorSessionData(true, false, fileInfoList1, "sel");
         // Update with a new set of files.  Remember, this is a replace.
-        session.updateFilePathList(fileInfoList3);
+        session.updateFilePathList(fileInfoList3, "Fake current tab 2");
         // Check to see whose there
         List<FileInfo> fList = session.getFileInfoList();
         // Array length should be 3
