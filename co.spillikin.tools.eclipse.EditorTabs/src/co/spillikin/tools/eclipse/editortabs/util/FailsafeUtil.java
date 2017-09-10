@@ -11,10 +11,6 @@
 
 package co.spillikin.tools.eclipse.editortabs.util;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
-import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.widgets.Shell;
 
 import co.spillikin.tools.eclipse.editortabs.TabsPluginException;

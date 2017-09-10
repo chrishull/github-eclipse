@@ -21,14 +21,14 @@ public class Constants {
     // Information stored in the XML file.
     // Version for backwards comparability
     public static final Integer VERSION_MAJOR = 1;
-    public static final Integer VERSION_MINOR = 0;
+    public static final Integer VERSION_MINOR = 1;
     public static final String AUTHOR = "Christopher Hull";
     public static final String COMPANY = "Spillikin Aerospace";
 
     public static final String DIALOG_TITLE = "EditorSessions Plugin";
 
     // State saved as...
-    public static final String FILENAME = "EditorSessionsData.xml";
+    public static final String FILENAME = "sessionData.xml";
 
     // Our properties file
     public static final String RESOURCE_FILE_NAME = "resource.dialogstrings";

@@ -37,19 +37,8 @@ public class DataUtil {
      * 
      * Call this when the plugin starts up to set up our
      * data store (which won't exist the first time the
-     * plugin is run.)
-     * 
-     * When the user switches workspaces or starts Eclipse 
-     * normally, there is a workspace established for that
-     * Eclipse session.  Set up our DataContainer so that
-     * it works with that workspace.  The underlying 
-     * dataStore (@see EditorSessionData) is aware of different
-     * workspaces and will store editor sessions across all
-     * workspace runs in a single XML file.
-     * 
-     * Even if separate XML files are used (stored within a workspace),
-     * this will work though the workspace identity is redundant.  This 
-     * gives us flexibility.
+     * plugin is run.)  The store will not exist when the 
+     * user switches workspaces as well.
      * 
      * @param workspaceName from the Activator (full path to worksspace)
      *   for instance, when running from within Eclipse, the secondary Eclipse
@@ -60,7 +49,9 @@ public class DataUtil {
      */
     public static DataUtil initialize(String workspaceName, String dataFilePath) {
         if (instance == null) {
-            instance = new DataUtil(workspaceName, dataFilePath);
+            instance = new DataUtil(dataFilePath);
+            // Set the current workspace name (not used, just to track things)
+            instance.editorSessionData.setWorkspaceName(workspaceName);
         }
         return instance;
     }
@@ -76,7 +67,9 @@ public class DataUtil {
      * @return
      */
     static DataUtil importData(String workspaceName, String dataFilePath, DataUtil oldUtil) {
-        instance = new DataUtil(workspaceName, dataFilePath, oldUtil);
+        instance = new DataUtil(dataFilePath, oldUtil);
+        // Set the current workspace name (not used, just to track things)
+        instance.editorSessionData.setWorkspaceName(workspaceName);
         return instance;
     }
 
@@ -137,36 +130,26 @@ public class DataUtil {
     // This is all the data this container touches.
     private EditorSessionsData editorSessionData = null;
 
-    // The workspace name that this data container was initialized with.
-    private String currentWorkspaceName;
-
     // Full path to the XML data file to load/save
     private String dataFilePath = null;
-
-    // The set of editor sessions for this workspace.
-    // DataContainer will provide convenience methods to access
-    // this.
-    private SessionMap currentSessionMap;
 
     /**
      * Initialize this DataContainer singleton by loading
      * and instantiating the underlying EditorSessionsData.
      * Then set EditorSessionsData to work with whatever the
-     * current Workspace is.
+     * current Workspace is (because state is stored in workspace now).
      * 
      * This is possibly deserialized JAXB.  If no file exists 
      * (will happen the first time) an exception will take place
      * 
-     * @param workspaceName
      * @param dataFilePath.  Full path.
      * @param importing.  If true we will not overwrite the dataFilePath 
      * in this object.
      */
-    private DataUtil(String workspaceName, String dataFilePath) {
-        this.currentWorkspaceName = workspaceName;
+    private DataUtil( String dataFilePath) {
         this.dataFilePath = dataFilePath;
         editorSessionData = Builder.load(dataFilePath);
-        currentSessionMap = editorSessionData.getSessionMap(workspaceName);
+        
     }
 
     /**
@@ -178,23 +161,9 @@ public class DataUtil {
      * @param dataFilePath
      * @param oldUtil
      */
-    private DataUtil(String workspaceName, String dataFilePath, DataUtil oldUtil) {
-        this.currentWorkspaceName = workspaceName;
+    private DataUtil(String dataFilePath, DataUtil oldUtil) {
         editorSessionData = Builder.load(dataFilePath);
-        currentSessionMap = editorSessionData.getSessionMap(workspaceName);
         this.dataFilePath = oldUtil.dataFilePath;
-    }
-
-    /**
-     * TESTING ONLY
-     * This constructor is used by the unit tests only.
-     * @param workspaceName
-     */
-    private DataUtil(String workspaceName) {
-        this.currentWorkspaceName = workspaceName;
-        this.dataFilePath = "no file used, tests running";
-        editorSessionData = new EditorSessionsData();
-        currentSessionMap = editorSessionData.getSessionMap(workspaceName);
     }
 
     /**
@@ -220,14 +189,16 @@ public class DataUtil {
      * @param group A group name.  May be new.
      */
     public void switchGroup(String sessionName) {
-        currentSessionMap.switchEditorSession(sessionName);
+        SessionMap sessionMap = editorSessionData.getSessionMap();
+        sessionMap.switchEditorSession(sessionName);
     }
 
     /**
      * Delete the current group if it exists.
      */
     public void deleteCurrentGroup() {
-        currentSessionMap.deleteCurrentEditorSession();
+        SessionMap sessionMap = editorSessionData.getSessionMap();
+        sessionMap.deleteCurrentEditorSession();
     }
 
     /**
@@ -236,7 +207,8 @@ public class DataUtil {
      * @return String[] String array of all tab group names.
      */
     public String[] getGroupNames() {
-        Set<String> keys = currentSessionMap.getSessionNames();
+        SessionMap sessionMap = editorSessionData.getSessionMap();
+        Set<String> keys = sessionMap.getSessionNames();
         Set<String> orderedStringSet = new TreeSet<String>();
         for (String key : keys) {
             orderedStringSet.add(key.toString());
@@ -250,7 +222,8 @@ public class DataUtil {
      * @return
      */
     public String getCurrentGroup() {
-        return currentSessionMap.getCurrentSessionName();
+        SessionMap sessionMap = editorSessionData.getSessionMap();
+        return sessionMap.getCurrentSessionName();
     }
 
     /**
@@ -259,6 +232,6 @@ public class DataUtil {
      * @return The current session map for this workspace.
      */
     public SessionMap getSessionMap() {
-        return currentSessionMap;
+        return editorSessionData.getSessionMap();
     }
 }

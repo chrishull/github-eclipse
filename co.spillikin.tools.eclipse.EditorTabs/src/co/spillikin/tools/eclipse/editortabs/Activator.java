@@ -13,13 +13,13 @@ package co.spillikin.tools.eclipse.editortabs;
 import java.io.File;
 
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 import co.spillikin.tools.eclipse.editortabs.util.DataUtil;
 import static co.spillikin.tools.eclipse.editortabs.Constants.FILENAME;
-
-import org.eclipse.core.runtime.Status;
 
 /**
  * The Activator is called when the plugin starts and stops.
@@ -45,12 +45,18 @@ public class Activator implements BundleActivator {
     public void start(BundleContext bundleContext) throws Exception {
         Activator.context = bundleContext;
 
-        new Status(Status.INFO, "XXXXXXXXXXXXXXXX FILETAB PLUGIN LOG MESSAGE TEST", null);
-
         // Init our DataContainer.  Let it try to load our XML file.
         String workspacePath = ResourcesPlugin.getWorkspace().getRoot().getLocation().toString();
-        File stateFile = context.getDataFile(FILENAME);
-        String path = stateFile.getAbsolutePath();
+
+        // This grabs the location of the plugin state (a file you can maintain 
+        // yourself via normal java io).  This remains constant. Preference data
+        // is also stored here. Not impacted by plugin updates.
+        // ./projects/workspace2/.metadata/.plugins/co.spillikin  ??
+        // /Users/chris/projects/runtime-EclipseApplication/.metadata/.plugins/
+        // co.spillikin.tools.eclipse.EditorTabs/EditorSessionsData.xml
+
+        IPath statePath = Platform.getStateLocation(bundleContext.getBundle());
+        String path = statePath.toString() + "/" + FILENAME;
         DataUtil.initialize(workspacePath, path);
 
     }

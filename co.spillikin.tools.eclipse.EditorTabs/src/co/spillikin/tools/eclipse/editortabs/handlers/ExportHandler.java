@@ -53,7 +53,6 @@ public class ExportHandler {
         String path = fileDialog.open();
         if (path != null) {
             String fullPath = path + File.separator + FILENAME;
-            System.out.println(fullPath);
             fgData.export(fullPath);
         }
         

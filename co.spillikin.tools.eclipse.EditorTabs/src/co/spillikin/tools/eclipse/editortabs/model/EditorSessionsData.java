@@ -60,7 +60,12 @@ public class EditorSessionsData {
     private String author = AUTHOR;
 
     // Map of workspaces to map of session names to sessions
-    private Map<String, SessionMap> workspaceMap = new HashMap<>();
+    // @Deprecated  As state is stored within a workspace the map is not needed.
+    // private Map<String, SessionMap> workspaceMap = new HashMap<>();
+    private String workspaceName = null;
+
+    // Map of session name to session data
+    private SessionMap sessionMap = new SessionMap();
 
     // Error state saved when this is deserialized (or not if an error took place)
     // Retrieved and checked whenever used via UI.
@@ -70,18 +75,39 @@ public class EditorSessionsData {
     public EditorSessionsData() {
     }
 
-    private Map<String, SessionMap> getWorkspaceMap() {
-        return workspaceMap;
+    /**
+     * Interface
+     * @return
+     */
+    public String getWorkspaceName() {
+        return workspaceName;
+    }
+
+    /**
+     * Interface
+     * @param workspaceMap
+     */
+    @XmlAttribute
+    public void setWorkspaceName(String workspaceName) {
+        this.workspaceName = workspaceName;
+    }
+
+    /**
+     * Interface
+     * @return
+     */
+    public SessionMap getSessionMap() {
+        return sessionMap;
     }
 
     /**
      * Interface
      * Set the workspace map.
-     * @param workspaceMap
+     * @param sessionMap
      */
-    @XmlElement
-    public void setWorkspaceMap(Map<String, SessionMap> workspaceMap) {
-        this.workspaceMap = workspaceMap;
+    @XmlElement(name="sessionMapContainer")
+    public void setSessionMap(SessionMap sessionMap) {
+        this.sessionMap = sessionMap;
     }
 
     /**
@@ -112,6 +138,7 @@ public class EditorSessionsData {
         this.versionMinor = versionMinor;
     }
 
+    @SuppressWarnings("unused")
     private String getCompany() {
         return company;
     }
@@ -121,6 +148,7 @@ public class EditorSessionsData {
         this.company = company;
     }
 
+    @SuppressWarnings("unused")
     private String getAuthor() {
         return author;
     }
@@ -128,31 +156,6 @@ public class EditorSessionsData {
     @XmlAttribute
     private void setAuthor(String author) {
         this.author = author;
-    }
-
-    /**
-     * Interface
-     * Given a workspace, return the associated session map.
-     * If none exists, create a new one and return it.
-     * 
-     * @param workspace name
-     * @return associated set of editor sessinos, mapped by name.
-     */
-    public SessionMap getSessionMap(String workspace) {
-        if (workspaceMap.get(workspace) == null) {
-            workspaceMap.put(workspace, new SessionMap());
-        }
-        return workspaceMap.get(workspace);
-    }
-
-    /**
-     * Interface
-     * Remove the session map for the given workspace.
-     * @param workspace
-     * @return
-     */
-    public void deleteSessionMap(String workspace) {
-        workspaceMap.remove(workspace);
     }
 
     /**

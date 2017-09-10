@@ -172,7 +172,6 @@ public class CreateUpdate {
                 if (newSessionName == null) {
                     newSessionName = bundle.getString(SESSION_NAME_IF_NULL_FOR_DISPLAY_KEY);
                 }
-                System.out.println("NEW DIALOG" + newSessionName);
                 MessageDialog.openInformation(s,
                     plugin.getResourceString(INFO_NEW_SESSION_TITLE_KEY),
                     plugin.getResourceString(INFO_NEW_SESSION_MESSAGE_KEY) + newSessionName);
