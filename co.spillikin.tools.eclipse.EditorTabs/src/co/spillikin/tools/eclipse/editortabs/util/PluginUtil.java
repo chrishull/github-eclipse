@@ -20,6 +20,7 @@ import java.util.ResourceBundle;
 import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
@@ -41,6 +42,14 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.core.runtime.Platform;
+
+import java.io.File;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
 
 import co.spillikin.tools.eclipse.editortabs.TabsPluginException;
 import co.spillikin.tools.eclipse.editortabs.model.FileInfo;
@@ -113,9 +122,12 @@ public class PluginUtil {
     }
 
     /**
-     * Given a full path String, open a file in an editor.
-     * @param pathStr
-     * @return
+     * Given a full path String, open a file in an editor tab.
+     * This handles files in the workspace and outside of it as well.  But 
+     * does not deal with external editors. You're on your own there.
+     * 
+     * @param pathStr Full path to file to open.
+     * @return True if file successfully opened. Exceptions are buried.
      */
     public boolean openFile(String pathStr) {
 
@@ -125,10 +137,32 @@ public class PluginUtil {
             .getActivePage();
         IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
         IEditorDescriptor desc = editorRegistry.getDefaultEditor(file.getName());
-        try {
-            workbenchPage.openEditor(new FileEditorInput(file), desc.getId());
-        } catch (PartInitException e) {
-            return false;
+
+        // Open this way if the path exists in the workspace (IFile is a real IFile)
+        if (file.exists()) {
+            try {
+                // workspace we get a CoreException (Can not determine URI) if doesn't exist.
+                // This will not throw for some reason if the file is outside the 
+                // workspace. You will get en empty editor tab with an error message.
+                // This is why we check first.
+                FileEditorInput fei = new FileEditorInput(file);
+                workbenchPage.openEditor(fei, desc.getId());
+            } catch (PartInitException e) {
+                return false;
+            }
+            // Open this way if the file is outside the workspace.
+        } else {
+            File fileToOpen = new File(pathStr);
+            if (fileToOpen.exists() && fileToOpen.isFile()) {
+                IFileStore fileStore = EFS.getLocalFileSystem().getStore(fileToOpen.toURI());
+                try {
+                    IDE.openEditorOnFileStore(workbenchPage, fileStore);
+                } catch (PartInitException e2) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
         }
         return true;
     }
@@ -196,7 +230,9 @@ public class PluginUtil {
             }
             if (ei != null) {
                 IFile file = getFileFromEditorInput(ei);
-                fileList.add(file);
+                if (file != null) {
+                    fileList.add(file);
+                }
             }
         }
         return fileList;
@@ -253,9 +289,7 @@ public class PluginUtil {
         IEditorReference[] erList = workbenchPage.getEditorReferences();
         // Loop thru editor references and try to match path.
         for (IEditorReference er : erList) {
-
             IEditorInput ei = null;
-
             try {
                 ei = er.getEditorInput();
             } catch (PartInitException e1) {
@@ -264,6 +298,9 @@ public class PluginUtil {
             }
             if (ei != null) {
                 IFile file = getFileFromEditorInput(ei);
+                if (file == null) {
+                    continue;
+                }
                 String path = file.getFullPath().toString();
                 if (path.equals(filePath)) {
                     // Returns the editor referenced by this object. Returns null 
@@ -297,8 +334,6 @@ public class PluginUtil {
         try {
             selection = getTextSelectionForPath(fullPath);
         } catch (PartInitException | BadLocationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
         // If we got an error or it came back null, set to 
         // empty so we won't attempt to select.
@@ -389,6 +424,9 @@ public class PluginUtil {
             ei = editorRef.getEditorInput();
             if (ei != null) {
                 IFile file = getFileFromEditorInput(ei);
+                if (file == null) {
+                    continue;
+                }
                 // if we found it, get it's ITextSelection
                 String p = file.getFullPath().toString();
                 if (fullPath.equals(p)) {
@@ -571,6 +609,14 @@ public class PluginUtil {
 
     }
 
+    /**
+     * Given an IEditorInput, return the associated IFile.
+     * NOTE.  This WILL return NULL if the IEditorInput is a document
+     * opened with, say, the WebBrowser.
+     * 
+     * @param input
+     * @return
+     */
     public static IFile getFileFromEditorInput(IEditorInput input) {
         if (input == null)
             return null;
