@@ -48,7 +48,7 @@
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_pVgfIIrOEeW7h_qdP9N9fw" featurename="menuContributions" parentElementId="xpath:/">
     <elements xsi:type="menu:MenuContribution" xmi:id="_BducUIrPEeW7h_qdP9N9fw" elementId="org.eclipse.pde.ui.templates.menucontribution.1" positionInParent="after=revert" parentId="file">
-      <children xsi:type="menu:Menu" xmi:id="_Dtii0IrPEeW7h_qdP9N9fw" elementId="org.eclipse.pde.ui.templates.menu.e4handlers" label="Editor Sessions..." iconURI="platform:/plugin/co.spillikin.tools.eclipse.EditorTabs/icons/Sample.png">
+      <children xsi:type="menu:Menu" xmi:id="_Dtii0IrPEeW7h_qdP9N9fw" elementId="org.eclipse.pde.ui.templates.menu.e4handlers" label="Editor Sessions..." iconURI="platform:/plugin/co.spillikin.tools.eclipse.EditorTabs/icons/SpillikinGearIcon.png">
         <children xsi:type="menu:HandledMenuItem" xmi:id="co.spillikin.mc2.create" elementId="org.eclipse.pde.ui.templates.handledmenuitem.0" label="" iconURI="" command="co.spillikin.command.create"/>
         <children xsi:type="menu:HandledMenuItem" xmi:id="co.spillikin.mc2.select" elementId="org.eclipse.pde.ui.templates.handledmenuitem.1" label="" iconURI="" command="co.spillikin.command.select"/>
         <children xsi:type="menu:HandledMenuItem" xmi:id="co.spillikin.mc2.rename" elementId="org.eclipse.pde.ui.templates.handledmenuitem.2" label="" iconURI="" command="co.spillikin.command.rename"/>

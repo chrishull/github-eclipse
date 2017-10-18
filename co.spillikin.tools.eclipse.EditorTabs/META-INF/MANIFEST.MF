@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: EditorTabs
+Bundle-Name: Editor Sessions Plugin
 Bundle-SymbolicName: co.spillikin.tools.eclipse.EditorTabs;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.2.0
 Bundle-Activator: co.spillikin.tools.eclipse.editortabs.Activator
 Bundle-Vendor: Spillikin Aerospace
 Require-Bundle: javax.inject,

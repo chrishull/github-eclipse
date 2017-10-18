@@ -26,6 +26,8 @@ public class FileInfo implements Comparable<FileInfo> {
     private Integer     startLine;
     private String  text;
     private Boolean isEmpty;
+    // Adding this for future feature
+    private Boolean isDirectory = false;
     
     // Serialization
     private FileInfo() {}
@@ -41,6 +43,18 @@ public class FileInfo implements Comparable<FileInfo> {
         this.length = length;
         this.text = text;
         this.isEmpty = isEmpty;
+    }
+    
+    /**
+     * Future feature.  Manage directories as a whole.
+     * @return
+     */
+    public Boolean getIsDirectory() {
+        return isDirectory;
+    }
+    @XmlAttribute
+    private void setIsDirectory(Boolean isDirectory) {
+        this.isDirectory = isDirectory;
     }
     
     public Boolean getIsEmpty() {

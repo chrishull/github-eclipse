@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="co.spillikin.eclipse.Feature"
+      label="Editor Sessions Manager"
+      version="1.2.0"">
+
+   <description url="http://www.example.com/description">
+      Editor sessions plugin for Eclipse.
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      (c) 2017 Spillikin Aerospace
+   </copyright>
+
+   <license url="http://www.example.com/license">
+ Created by Christopher Hull on 10 September 2017.
+ 
+ Copyright 2017 Spillikin Aerospace. All rights reserved.
+  http://www.chrishull.com
+  http://www.spillikinaerospace.com
+  
+ Licensed under the Apache License 2.0 http://www.apache.org/licenses/LICENSE-2.0
+  
+ Distributed on an "AS IS" basis without warranties or conditions of any kind, either express or implied.
+  
+ For full instructions see http://chrishull.com/projects/eclipse  You may review the source here at http://github.com/chrishull/github-eclipse
+
+ -Christopher Hull
+ http://chrishull.com
+ Send any comments, feature requests or bug reports to chrishull42@gmail.com
+
+
+   
+   </license>
+
+   <plugin
+         id="co.spillikin.tools.eclipse.EditorTabs"
+         download-size="0"
+         install-size="0"
+         version="1.2.0"
+         unpack="false"/>
+
+</feature>

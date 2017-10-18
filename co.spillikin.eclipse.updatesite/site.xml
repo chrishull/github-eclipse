@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/co.spillikin.eclipse.Feature_1.0.0.beta.jar" id="co.spillikin.eclipse.Feature" version="1.0.0.beta"/>
+   <feature url="features/co.spillikin.eclipse.Feature_1.2.0.jar" id="co.spillikin.eclipse.Feature" version="1.2.0"/>
 </site>

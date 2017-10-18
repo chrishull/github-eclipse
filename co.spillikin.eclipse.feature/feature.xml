@@ -2,10 +2,10 @@
 <feature
       id="co.spillikin.eclipse.Feature"
       label="Editor Sessions Manager"
-      version="1.0.0.beta">
+      version="1.2.0">
 
    <description url="http://chrishull.com/projects/eclipse/">
-      Spillikin Aerospace file tab plugin for Eclipse.
+      Editor session manager for Eclipse.
    </description>
 
    <copyright url="http://chrishull.com/projects/eclipse/">
@@ -21,23 +21,20 @@ Copyright 2017 Spillikin Aerospace. All rights reserved.
   
 Licensed under the Apache License 2.0 http://www.apache.org/licenses/LICENSE-2.0
   
-Distributed on an "AS IS" basis without warranties or conditions of any kind, either express or implied.
+Distributed on an &quot;AS IS&quot; basis without warranties or conditions of any kind, either express or implied.
   
 For full instructions see http://chrishull.com/projects/eclipse  You may review the source here at http://github.com/chrishull/github-eclipse
 
 -Christopher Hull
 http://chrishull.com
 Send any comments, feature requests or bug reports to chrishull42@gmail.com
-
-
-   
    </license>
 
    <plugin
          id="co.spillikin.tools.eclipse.EditorTabs"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.2.0"
          unpack="false"/>
 
 </feature>
